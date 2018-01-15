@@ -32,7 +32,7 @@ namespace LeagueSandbox.GameServer.Logic.Packets.PacketDefinitions.S2C
             buffer.Write((float)p.GetZ());
             buffer.Write((float)p.Y);
             buffer.Write((int)0); // Unk ((float)castDelay ?)
-            buffer.Write((float)p.getMoveSpeed()); // Projectile speed
+            buffer.Write((float)p.GetMoveSpeed()); // Projectile speed
             buffer.Write((int)0); // Unk
             buffer.Write((int)0); // Unk
             buffer.Write((int)0x7f7fffff); // Unk
@@ -72,7 +72,7 @@ namespace LeagueSandbox.GameServer.Logic.Packets.PacketDefinitions.S2C
             if (!p.Target.IsSimpleTarget)
             {
                 buffer.Write((byte)0x01); // numTargets
-                buffer.Write((p.Target as Unit).NetId);
+                buffer.Write((p.Target as AttackableUnit).NetId);
                 buffer.Write((byte)0); // hitResult
             }
             else

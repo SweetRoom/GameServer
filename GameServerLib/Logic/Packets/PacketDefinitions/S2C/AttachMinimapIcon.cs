@@ -6,7 +6,7 @@ namespace LeagueSandbox.GameServer.Logic.Packets.PacketDefinitions.S2C
 {
     public class AttachMinimapIcon : BasePacket
     {
-        public AttachMinimapIcon(Unit unit, byte unk1, string iconName, byte unk2, string unk3, string unk4)
+        public AttachMinimapIcon(AttackableUnit unit, byte unk1, string iconName, byte unk2, string unk3, string unk4)
             : base(PacketCmd.PKT_S2C_AttachMinimapIcon)
         {
             buffer.Write(unit.NetId);

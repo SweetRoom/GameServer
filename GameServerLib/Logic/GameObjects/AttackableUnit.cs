@@ -11,51 +11,7 @@ using System.Linq;
 
 namespace LeagueSandbox.GameServer.Logic.GameObjects
 {
-    public enum DamageType : byte
-    {
-        DAMAGE_TYPE_PHYSICAL = 0x0,
-        DAMAGE_TYPE_MAGICAL = 0x1,
-        DAMAGE_TYPE_TRUE = 0x2
-    }
-
-    public enum DamageText : byte
-    {
-        DAMAGE_TEXT_INVULNERABLE = 0x0,
-        DAMAGE_TEXT_DODGE = 0x2,
-        DAMAGE_TEXT_CRITICAL = 0x3,
-        DAMAGE_TEXT_NORMAL = 0x4,
-        DAMAGE_TEXT_MISS = 0x5
-    }
-
-    public enum DamageSource
-    {
-        DAMAGE_SOURCE_ATTACK,
-        DAMAGE_SOURCE_SPELL,
-        DAMAGE_SOURCE_SUMMONER_SPELL, // Ignite shouldn't destroy Banshee's
-        DAMAGE_SOURCE_PASSIVE // Red/Thornmail shouldn't as well
-    }
-
-    public enum AttackType : byte
-    {
-        ATTACK_TYPE_RADIAL,
-        ATTACK_TYPE_MELEE,
-        ATTACK_TYPE_TARGETED
-    }
-
-    public enum MoveOrder
-    {
-        MOVE_ORDER_MOVE,
-        MOVE_ORDER_ATTACKMOVE
-    }
-
-    public enum ShieldType : byte
-    {
-        GreenShield = 0x01,
-        MagicShield = 0x02,
-        NormalShield = 0x03
-    }
-
-    public class Unit : GameObject
+    public class AttackableUnit : GameObject
     {
         internal const float DETECT_RANGE = 475.0f;
         internal const int EXP_RANGE = 1400;
@@ -66,7 +22,7 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
         protected ItemManager _itemManager = Program.ResolveDependency<ItemManager>();
         protected PlayerManager _playerManager = Program.ResolveDependency<PlayerManager>();
 
-        private Random random = new Random();
+        private Random _random = new Random();
 
         public CharData CharData { get; protected set; }
         public SpellData AASpellData { get; protected set; }
@@ -79,7 +35,7 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
         public bool IsMelee { get; set; }
         protected internal bool _hasMadeInitialAttack;
         private bool _nextAttackFlag;
-        public Unit DistressCause { get; protected set; }
+        public AttackableUnit DistressCause { get; protected set; }
         private float _statUpdateTimer;
         private uint _autoAttackProjId;
         public MoveOrder MoveOrder { get; set; }
@@ -87,15 +43,15 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
         /// <summary>
         /// Unit we want to attack as soon as in range
         /// </summary>
-        public Unit TargetUnit { get; set; }
-        public Unit AutoAttackTarget { get; set; }
+        public AttackableUnit TargetUnit { get; set; }
+        public AttackableUnit AutoAttackTarget { get; set; }
 
         public bool IsDead { get; protected set; }
 
         private string _model;
         public string Model
         {
-            get { return _model; }
+            get => _model;
             set
             {
                 _model = value;
@@ -113,9 +69,9 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
 
         public bool IsCastingSpell { get; set; }
 
-        private List<UnitCrowdControl> crowdControlList = new List<UnitCrowdControl>();
+        private List<UnitCrowdControl> _crowdControlList = new List<UnitCrowdControl>();
 
-        public Unit(
+        public AttackableUnit(
             string model,
             Stats stats,
             int collisionRadius = 40,
@@ -174,20 +130,24 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
             {
                 this.StopMovement();
             }
-            crowdControlList.Add(cc);
+            _crowdControlList.Add(cc);
         }
+
         public void RemoveCrowdControl(UnitCrowdControl cc)
         {
-            crowdControlList.Remove(cc);
+            _crowdControlList.Remove(cc);
         }
+
         public void ClearAllCrowdControl()
         {
-            crowdControlList.Clear();
+            _crowdControlList.Clear();
         }
+
         public bool HasCrowdControl(CrowdControlType ccType)
         {
-            return crowdControlList.FirstOrDefault((cc)=>cc.IsTypeOf(ccType)) != null;
+            return _crowdControlList.FirstOrDefault((cc)=>cc.IsTypeOf(ccType)) != null;
         }
+
         public void AddStatModifier(ChampionStatModifier statModifier)
         {
             Stats.AddModifier(statModifier);
@@ -208,7 +168,7 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
             this.SetWaypoints(new List<Vector2> { this.GetPosition(), this.GetPosition() });
         }
 
-        public override void update(float diff)
+        public override void Update(float diff)
         {
             _timerUpdate += diff;
             if (_timerUpdate >= UPDATE_TIME)
@@ -216,18 +176,18 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
                 _timerUpdate = 0;
             }
 
-            foreach(UnitCrowdControl cc in crowdControlList)
+            foreach(UnitCrowdControl cc in _crowdControlList)
             {
                 cc.Update(diff);
             }
-            crowdControlList.RemoveAll((cc)=>cc.IsDead());
+            _crowdControlList.RemoveAll((cc)=>cc.IsDead());
 
-            var onUpdate = _scriptEngine.GetStaticMethod<Action<Unit, double>>(Model, "Passive", "OnUpdate");
+            var onUpdate = _scriptEngine.GetStaticMethod<Action<AttackableUnit, double>>(Model, "Passive", "OnUpdate");
             onUpdate?.Invoke(this, diff);
 
             UpdateAutoAttackTarget(diff);
 
-            base.update(diff);
+            base.Update(diff);
 
             _statUpdateTimer += diff;
             if (_statUpdateTimer >= 500)
@@ -299,8 +259,8 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
                 }
                 else if (GetDistanceTo(TargetUnit) <= Stats.Range.Total)
                 {
-                    refreshWaypoints();
-                    _isNextAutoCrit = random.Next(0, 100) < Stats.CriticalChance.Total * 100;
+                    RefreshWaypoints();
+                    _isNextAutoCrit = _random.Next(0, 100) < Stats.CriticalChance.Total * 100;
                     if (_autoAttackCurrentCooldown <= 0)
                     {
                         IsAttacking = true;
@@ -337,7 +297,7 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
                 }
                 else
                 {
-                    refreshWaypoints();
+                    RefreshWaypoints();
                 }
 
             }
@@ -360,30 +320,30 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
             }
         }
 
-        public override float getMoveSpeed()
+        public override float GetMoveSpeed()
         {
             return Stats.MoveSpeed.Total;
         }
 
-        public override void onCollision(GameObject collider)
+        public override void OnCollision(GameObject collider)
         {
-            base.onCollision(collider);
+            base.OnCollision(collider);
             if (collider == null)
             {
-                var onCollideWithTerrain = _scriptEngine.GetStaticMethod<Action<Unit>>(Model, "Passive", "onCollideWithTerrain");
+                var onCollideWithTerrain = _scriptEngine.GetStaticMethod<Action<AttackableUnit>>(Model, "Passive", "onCollideWithTerrain");
                 onCollideWithTerrain?.Invoke(this);
             }
             else
             {
-                var onCollide = _scriptEngine.GetStaticMethod<Action<Unit, Unit>>(Model, "Passive", "onCollide");
-                onCollide?.Invoke(this, collider as Unit);
+                var onCollide = _scriptEngine.GetStaticMethod<Action<AttackableUnit, AttackableUnit>>(Model, "Passive", "onCollide");
+                onCollide?.Invoke(this, collider as AttackableUnit);
             }
         }
 
         /// <summary>
         /// This is called by the AA projectile when it hits its target
         /// </summary>
-        public virtual void AutoAttackHit(Unit target)
+        public virtual void AutoAttackHit(AttackableUnit target)
         {
             if (HasCrowdControl(CrowdControlType.Blind)) {
                 DealDamageTo(target, 0, DamageType.DAMAGE_TYPE_PHYSICAL,
@@ -398,7 +358,7 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
                 damage *= Stats.getCritDamagePct();
             }
 
-            var onAutoAttack = _scriptEngine.GetStaticMethod<Action<Unit, Unit>>(Model, "Passive", "OnAutoAttack");
+            var onAutoAttack = _scriptEngine.GetStaticMethod<Action<AttackableUnit, AttackableUnit>>(Model, "Passive", "OnAutoAttack");
             onAutoAttack?.Invoke(this, target);
 
             DealDamageTo(target, damage, DamageType.DAMAGE_TYPE_PHYSICAL,
@@ -406,7 +366,7 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
                                              _isNextAutoCrit);
         }
 
-        public virtual void DealDamageTo(Unit target, float damage, DamageType type, DamageSource source, DamageText damageText)
+        public virtual void DealDamageTo(AttackableUnit target, float damage, DamageType type, DamageSource source, DamageText damageText)
         {
             float defense = 0;
             float regain = 0;
@@ -438,8 +398,7 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
 
             if (target.HasCrowdControl(CrowdControlType.Invulnerable))
             {
-                bool attackerIsFountainTurret = this is LaneTurret && (this as LaneTurret).Type == TurretType.FountainTurret;
-                if (attackerIsFountainTurret == false)
+                if (!(this is LaneTurret turret) || turret.Type != TurretType.FountainTurret)
                 {
                     damage = 0;
                     damageText = DamageText.DAMAGE_TEXT_INVULNERABLE;
@@ -451,7 +410,7 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
             if (!target.IsDead && target.GetStats().CurrentHealth <= 0)
             {
                 target.IsDead = true;
-                target.die(this);
+                target.Die(this);
             }
             _game.PacketNotifier.NotifyDamageDone(this, target, damage, type, damageText);
             _game.PacketNotifier.NotifyUpdatedStats(target, false);
@@ -464,7 +423,7 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
             }
         }
 
-        public virtual void DealDamageTo(Unit target, float damage, DamageType type, DamageSource source, bool isCrit)
+        public virtual void DealDamageTo(AttackableUnit target, float damage, DamageType type, DamageSource source, bool isCrit)
         {
             var text = DamageText.DAMAGE_TEXT_NORMAL;
 
@@ -475,14 +434,14 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
             DealDamageTo(target, damage, type, source, text);
         }
 
-        public virtual void die(Unit killer)
+        public virtual void Die(AttackableUnit killer)
         {
             setToRemove();
             _game.ObjectManager.StopTargeting(this);
 
             _game.PacketNotifier.NotifyNpcDie(this, killer);
 
-            var onDie = _scriptEngine.GetStaticMethod<Action<Unit, Unit>>(Model, "Passive", "OnDie");
+            var onDie = _scriptEngine.GetStaticMethod<Action<AttackableUnit, AttackableUnit>>(Model, "Passive", "OnDie");
             onDie?.Invoke(this, killer);
 
             var exp = _game.Map.MapGameScript.GetExperienceFor(this);
@@ -502,10 +461,10 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
 
             if (killer != null)
             {
-                var cKiller = killer as Champion;
-
-                if (cKiller == null)
+                if (!(killer is Champion cKiller))
+                {
                     return;
+                }
 
                 var gold = _game.Map.MapGameScript.GetGoldFor(this);
                 if (gold <= 0)
@@ -519,7 +478,7 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
                 if (cKiller.KillDeathCounter < 0)
                 {
                     cKiller.ChampionGoldFromMinions += gold;
-                    _logger.LogCoreInfo($"Adding gold form minions to reduce death spree: {cKiller.ChampionGoldFromMinions}");
+                    _logger.LogCoreInfo($"Adding gold from minions to reduce death spree: {cKiller.ChampionGoldFromMinions}");
                 }
 
                 if (cKiller.ChampionGoldFromMinions >= 50 && cKiller.KillDeathCounter < 0)
@@ -535,12 +494,12 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
             }
         }
 
-        public virtual bool isInDistress()
+        public virtual bool IsInDistress()
         {
             return false; //return DistressCause;
         }
 
-        public void SetTargetUnit(Unit target)
+        public void SetTargetUnit(AttackableUnit target)
         {
             if (target == null) // If we are unsetting the target (moving around)
             {
@@ -556,13 +515,15 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
             }
 
             TargetUnit = target;
-            refreshWaypoints();
+            RefreshWaypoints();
         }
 
-        public virtual void refreshWaypoints()
+        public virtual void RefreshWaypoints()
         {
-            if (TargetUnit == null || (GetDistanceTo(TargetUnit) <= Stats.Range.Total && Waypoints.Count == 1))
+            if (TargetUnit == null || GetDistanceTo(TargetUnit) <= Stats.Range.Total && Waypoints.Count == 1)
+            {
                 return;
+            }
 
             if (GetDistanceTo(TargetUnit) <= Stats.Range.Total - 2.0f)
             {
@@ -578,9 +539,9 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
             }
         }
 
-        public ClassifyUnit ClassifyTarget(Unit target)
+        public ClassifyUnit ClassifyTarget(AttackableUnit target)
         {
-            if (target.TargetUnit != null && target.TargetUnit.isInDistress()) // If an ally is in distress, target this unit. (Priority 1~5)
+            if (target.TargetUnit != null && target.TargetUnit.IsInDistress()) // If an ally is in distress, target this unit. (Priority 1~5)
             {
                 if (target is Champion && target.TargetUnit is Champion) // If it's a champion attacking an allied champion
                 {
@@ -608,25 +569,27 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
                 }
             }
 
-            var p = target as Placeable;
-            if (p != null)
+            if (target is Placeable p)
             {
                 return ClassifyUnit.Placeable;
             }
 
-            var m = target as Minion;
-            if (m != null)
+            if (target is Minion m)
             {
-                switch (m.getType())
+                var dictionary = new Dictionary<MinionSpawnType, ClassifyUnit>
                 {
-                    case MinionSpawnType.MINION_TYPE_MELEE:
-                        return ClassifyUnit.MeleeMinion;
-                    case MinionSpawnType.MINION_TYPE_CASTER:
-                        return ClassifyUnit.CasterMinion;
-                    case MinionSpawnType.MINION_TYPE_CANNON:
-                    case MinionSpawnType.MINION_TYPE_SUPER:
-                        return ClassifyUnit.SuperOrCannonMinion;
+                    {MinionSpawnType.MINION_TYPE_MELEE, ClassifyUnit.MeleeMinion},
+                    {MinionSpawnType.MINION_TYPE_CASTER, ClassifyUnit.CasterMinion},
+                    {MinionSpawnType.MINION_TYPE_CANNON, ClassifyUnit.SuperOrCannonMinion},
+                    {MinionSpawnType.MINION_TYPE_SUPER, ClassifyUnit.SuperOrCannonMinion}
+                };
+
+                if (!dictionary.ContainsKey(m.getType()))
+                {
+                    return ClassifyUnit.Default;
                 }
+
+                return dictionary[m.getType()];
             }
 
             if (target is BaseTurret)
@@ -681,4 +644,49 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
         Nexus = 13,
         Default = 14
     }
+
+    public enum DamageType : byte
+    {
+        DAMAGE_TYPE_PHYSICAL = 0x0,
+        DAMAGE_TYPE_MAGICAL = 0x1,
+        DAMAGE_TYPE_TRUE = 0x2
+    }
+
+    public enum DamageText : byte
+    {
+        DAMAGE_TEXT_INVULNERABLE = 0x0,
+        DAMAGE_TEXT_DODGE = 0x2,
+        DAMAGE_TEXT_CRITICAL = 0x3,
+        DAMAGE_TEXT_NORMAL = 0x4,
+        DAMAGE_TEXT_MISS = 0x5
+    }
+
+    public enum DamageSource
+    {
+        DAMAGE_SOURCE_ATTACK,
+        DAMAGE_SOURCE_SPELL,
+        DAMAGE_SOURCE_SUMMONER_SPELL, // Ignite shouldn't destroy Banshee's
+        DAMAGE_SOURCE_PASSIVE // Red/Thornmail shouldn't as well
+    }
+
+    public enum AttackType : byte
+    {
+        ATTACK_TYPE_RADIAL,
+        ATTACK_TYPE_MELEE,
+        ATTACK_TYPE_TARGETED
+    }
+
+    public enum MoveOrder
+    {
+        MOVE_ORDER_MOVE,
+        MOVE_ORDER_ATTACKMOVE
+    }
+
+    public enum ShieldType : byte
+    {
+        GreenShield = 0x01,
+        MagicShield = 0x02,
+        NormalShield = 0x03
+    }
+
 }

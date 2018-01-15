@@ -8,7 +8,7 @@ namespace LeagueSandbox.GameServer.Logic.Packets.PacketDefinitions.S2C
 {
     public class Dash : BasePacket
     {
-        public Dash(Unit u,
+        public Dash(AttackableUnit u,
             Target t,
             float dashSpeed,
             bool keepFacingLastDirection,

@@ -30,9 +30,9 @@ namespace LeagueSandbox.GameServer.Logic.Scripting.CSharp
 
         string GetMinionModel(TeamId team, MinionSpawnType type);
 
-        float GetGoldFor(Unit u);
+        float GetGoldFor(AttackableUnit u);
 
-        float GetExperienceFor(Unit u);
+        float GetExperienceFor(AttackableUnit u);
 
         Vector3 GetEndGameCameraPosition(TeamId team);
     }

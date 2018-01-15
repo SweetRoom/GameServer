@@ -2,13 +2,13 @@
 
 namespace LeagueSandbox.GameServer.Logic.GameObjects
 {
-    public class Placeable : Unit
+    public class Placeable : AttackableUnit
     {
         public string Name { get; private set; }
-        public Unit Owner { get; private set; } // We'll probably want to change this in the future
+        public AttackableUnit Owner { get; private set; } // We'll probably want to change this in the future
 
         public Placeable(
-            Unit owner,
+            AttackableUnit owner,
             float x,
             float y,
             string model,
@@ -33,7 +33,7 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
             _game.PacketNotifier.NotifySpawn(this);
         }
 
-        public override bool isInDistress()
+        public override bool IsInDistress()
         {
             return DistressCause != null;
         }

@@ -32,7 +32,7 @@ namespace LeagueSandbox.GameServer.Logic
             _visibleByTeam[Team] = true;
             if (_game.IsRunning)
             {
-                var p = new SetTeam(this as Unit, team);
+                var p = new SetTeam(this as AttackableUnit, team);
                 _game.PacketHandlerManager.broadcastPacket(p, Channel.CHL_S2C);
             }
         }
@@ -89,7 +89,7 @@ namespace LeagueSandbox.GameServer.Logic
             _game.Map.CollisionHandler.RemoveObject(this);
         }
 
-        public virtual void onCollision(GameObject collider) { }
+        public virtual void OnCollision(GameObject collider) { }
 
         /// <summary>
         /// Moves the object depending on its target, updating its coordinate.
@@ -113,7 +113,7 @@ namespace LeagueSandbox.GameServer.Logic
                 _direction = new Vector2(0, 0);
             }
 
-            var moveSpeed = getMoveSpeed();
+            var moveSpeed = GetMoveSpeed();
             if (IsDashing)
             {
                 moveSpeed = _dashSpeed;
@@ -138,9 +138,9 @@ namespace LeagueSandbox.GameServer.Logic
 
                 if (IsDashing)
                 {
-                    if (this is Unit)
+                    if (this is AttackableUnit)
                     {
-                        var u = this as Unit;
+                        var u = this as AttackableUnit;
 
                         var animList = new List<string>();
                         _game.PacketNotifier.NotifySetAnimation(u, animList);
@@ -177,11 +177,11 @@ namespace LeagueSandbox.GameServer.Logic
             yvector /= toDivide;
         }
 
-        public virtual void update(float diff)
+        public virtual void Update(float diff)
         {
             Move(diff);
         }
-        public virtual float getMoveSpeed()
+        public virtual float GetMoveSpeed()
         {
             return 0;
         }
@@ -264,9 +264,9 @@ namespace LeagueSandbox.GameServer.Logic
         public void SetVisibleByTeam(TeamId team, bool visible)
         {
             _visibleByTeam[team] = visible;
-            if (this is Unit)
+            if (this is AttackableUnit)
             {
-                _game.PacketNotifier.NotifyUpdatedStats(this as Unit, false);
+                _game.PacketNotifier.NotifyUpdatedStats(this as AttackableUnit, false);
             }
         }
 

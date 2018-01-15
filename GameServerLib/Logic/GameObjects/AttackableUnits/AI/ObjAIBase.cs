@@ -151,10 +151,10 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
             throw new Exception("No slot found with requested value"); // If no open slot or no corresponding slot
         }
 
-        public override void update(float diff)
+        public override void Update(float diff)
         {
             BuffGameScriptControllers.RemoveAll((b) => b.NeedsRemoved());
-            base.update(diff);
+            base.Update(diff);
         }
     }
 }

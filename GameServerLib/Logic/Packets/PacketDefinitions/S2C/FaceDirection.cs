@@ -5,7 +5,7 @@ namespace LeagueSandbox.GameServer.Logic.Packets.PacketDefinitions.S2C
 {
     public class FaceDirection : BasePacket
     {
-        public FaceDirection(Unit u,
+        public FaceDirection(AttackableUnit u,
             float relativeX,
             float relativeY,
             float relativeZ,

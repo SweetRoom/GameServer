@@ -6,7 +6,7 @@ namespace LeagueSandbox.GameServer.Logic.Packets.PacketDefinitions.S2C
 {
     public class PlaySound : BasePacket
     {
-        public PlaySound(Unit unit, string soundName)
+        public PlaySound(AttackableUnit unit, string soundName)
             : base(PacketCmd.PKT_S2C_PlaySound, unit.NetId)
         {
             buffer.Write(Encoding.Default.GetBytes(soundName));

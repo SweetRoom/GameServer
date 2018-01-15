@@ -157,7 +157,7 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
             }
         }
 
-        public override void update(float diff)
+        public override void Update(float diff)
         {
             //Update Stats if it's time
             switch (Type)
@@ -271,19 +271,19 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
                     break;
             }
             _turretHPUpdated = true;
-            base.update(diff);
+            base.Update(diff);
         }
 
-        public override void refreshWaypoints()
+        public override void RefreshWaypoints()
         {
         }
 
-        public override float getMoveSpeed()
+        public override float GetMoveSpeed()
         {
             return 0;
         }
 
-        public override void AutoAttackHit(Unit target)
+        public override void AutoAttackHit(AttackableUnit target)
         {
             if (Type == TurretType.FountainTurret)
             {

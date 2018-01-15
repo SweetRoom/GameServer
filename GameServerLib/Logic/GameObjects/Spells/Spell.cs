@@ -273,7 +273,7 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
             _game.ObjectManager.AddObject(l);
         }
 
-        public void spellAnimation(string animName, Unit target)
+        public void spellAnimation(string animName, AttackableUnit target)
         {
             _game.PacketNotifier.NotifySpellAnimation(target, animName);
         }

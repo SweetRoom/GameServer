@@ -6,7 +6,7 @@ namespace LeagueSandbox.GameServer.Logic.Packets.PacketDefinitions.S2C
 {
     public class FloatingText : BasePacket
     {
-        public FloatingText(Unit u, string text)
+        public FloatingText(AttackableUnit u, string text)
             : base(PacketCmd.PKT_S2C_FloatingText, u.NetId)
         {
             buffer.Write((int)0); // netid?

@@ -5,7 +5,7 @@ namespace LeagueSandbox.GameServer.Logic.Packets.PacketDefinitions.S2C
 {
     public class SetSpellActiveState : BasePacket
     {
-        public SetSpellActiveState(Unit u, byte slot, byte state)
+        public SetSpellActiveState(AttackableUnit u, byte slot, byte state)
             : base(PacketCmd.PKT_S2C_SetSpellActiveState, u.NetId)
         {
             buffer.Write((byte)slot);

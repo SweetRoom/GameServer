@@ -5,7 +5,7 @@ namespace LeagueSandbox.GameServer.Logic.Packets.PacketDefinitions.S2C
 {
     public class BeginAutoAttack : BasePacket
     {
-        public BeginAutoAttack(Unit attacker, Unit attacked, uint futureProjNetId, bool isCritical)
+        public BeginAutoAttack(AttackableUnit attacker, AttackableUnit attacked, uint futureProjNetId, bool isCritical)
             : base(PacketCmd.PKT_S2C_BeginAutoAttack, attacker.NetId)
         {
             buffer.Write(attacked.NetId);

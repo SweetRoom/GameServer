@@ -17,7 +17,7 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
             float x,
             float y,
             int collisionRadius,
-            Unit owner,
+            AttackableUnit owner,
             Target target,
             Spell originSpell,
             int flags,
@@ -27,7 +27,7 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
             _affectAsCastIsOver = affectAsCastIsOver;
         }
 
-        public override void update(float diff)
+        public override void Update(float diff)
         {
             if (!_affectAsCastIsOver)
             {
@@ -39,7 +39,7 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
                 var objects = _game.ObjectManager.GetObjects().Values;
                 foreach (var obj in objects)
                 {
-                    var u = obj as Unit;
+                    var u = obj as AttackableUnit;
                     if (u != null && TargetIsInRectangle(u))
                     {
                         CheckFlagsForUnit(u);
@@ -61,7 +61,7 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
             toRemove = true;
         }
 
-        protected override void CheckFlagsForUnit(Unit unit)
+        protected override void CheckFlagsForUnit(AttackableUnit unit)
         {
             if (!Target.IsSimpleTarget)
                 return;
@@ -143,7 +143,7 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
         /// </summary>
         /// <param name="target">Target to be checked</param>
         /// <returns>true if target is in rectangle, otherwise false.</returns>
-        private bool TargetIsInRectangle(Unit target)
+        private bool TargetIsInRectangle(AttackableUnit target)
         {
             var unitCoords = new Vector2(target.X, target.Y);
 

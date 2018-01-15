@@ -9,7 +9,7 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
     public class Projectile : ObjMissile
     {
         public List<GameObject> ObjectsHit { get; private set; }
-        public Unit Owner { get; private set; }
+        public AttackableUnit Owner { get; private set; }
         public int ProjectileId { get; private set; }
         public SpellData SpellData { get; private set; }
         protected float _moveSpeed;
@@ -20,7 +20,7 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
             float x,
             float y,
             int collisionRadius,
-            Unit owner,
+            AttackableUnit owner,
             Target target,
             Spell originSpell,
             float moveSpeed,
@@ -51,7 +51,7 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
             owner.incrementAttackerCount();
         }
 
-        public override void update(float diff)
+        public override void Update(float diff)
         {
             if (Target == null)
             {
@@ -59,31 +59,31 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
                 return;
             }
 
-            base.update(diff);
+            base.Update(diff);
         }
 
-        public override void onCollision(GameObject collider)
+        public override void OnCollision(GameObject collider)
         {
-            base.onCollision(collider);
+            base.OnCollision(collider);
             if (Target != null && Target.IsSimpleTarget && !isToRemove())
             {
-                CheckFlagsForUnit(collider as Unit);
+                CheckFlagsForUnit(collider as AttackableUnit);
             }
             else
             {
                 if (Target == collider)
                 {
-                    CheckFlagsForUnit(collider as Unit);
+                    CheckFlagsForUnit(collider as AttackableUnit);
                 }
             }
         }
 
-        public override float getMoveSpeed()
+        public override float GetMoveSpeed()
         {
             return _moveSpeed;
         }
 
-        protected virtual void CheckFlagsForUnit(Unit unit)
+        protected virtual void CheckFlagsForUnit(AttackableUnit unit)
         {
             if (Target == null)
             {

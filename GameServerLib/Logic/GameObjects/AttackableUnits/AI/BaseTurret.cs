@@ -26,12 +26,12 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
         public void CheckForTargets()
         {
             var objects = _game.ObjectManager.GetObjects();
-            Unit nextTarget = null;
+            AttackableUnit nextTarget = null;
             var nextTargetPriority = 14;
 
             foreach (var it in objects)
             {
-                var u = it.Value as Unit;
+                var u = it.Value as AttackableUnit;
 
                 if (u == null || u.IsDead || u.Team == Team || GetDistanceTo(u) > Stats.Range.Total)
                     continue;
@@ -77,7 +77,7 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
             }
         }
 
-        public override void update(float diff)
+        public override void Update(float diff)
         {
             if (!IsAttacking)
             {
@@ -91,10 +91,10 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
                 _game.PacketNotifier.NotifySetTarget(this, null);
             }
 
-            base.update(diff);
+            base.Update(diff);
         }
 
-        public override void die(Unit killer)
+        public override void Die(AttackableUnit killer)
         {
             foreach (var player in _game.ObjectManager.GetAllChampionsFromTeam(killer.Team))
             {
@@ -113,14 +113,14 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
                 _game.PacketNotifier.NotifyAddGold(player, this, goldEarn);
             }
             _game.PacketNotifier.NotifyUnitAnnounceEvent(UnitAnnounces.TurretDestroyed, this, killer);
-            base.die(killer);
+            base.Die(killer);
         }
 
-        public override void refreshWaypoints()
+        public override void RefreshWaypoints()
         {
         }
 
-        public override float getMoveSpeed()
+        public override float GetMoveSpeed()
         {
             return 0;
         }

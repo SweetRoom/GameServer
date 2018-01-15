@@ -35,12 +35,12 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
             _game.ObjectManager.AddInhibitor(this);
         }
 
-        public override void die(Unit killer)
+        public override void Die(AttackableUnit killer)
         {
             var objects = _game.ObjectManager.GetObjects().Values;
             foreach (var obj in objects)
             {
-                var u = obj as Unit;
+                var u = obj as AttackableUnit;
                 if (u != null && u.TargetUnit == this)
                 {
                     u.SetTargetUnit(null);
@@ -75,7 +75,7 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
             setState(InhibitorState.Dead, killer);
             RespawnAnnounced = false;
 
-            base.die(killer);
+            base.Die(killer);
         }
 
         public void setState(InhibitorState state, GameObject killer = null)
@@ -98,7 +98,7 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
             return RESPAWN_TIMER - diff.TotalMilliseconds;
         }
 
-        public override void update(float diff)
+        public override void Update(float diff)
         {
             if (!RespawnAnnounced && getState() == InhibitorState.Dead && getRespawnTimer() <= RESPAWN_ANNOUNCE)
             {
@@ -106,10 +106,10 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
                 RespawnAnnounced = true;
             }
 
-            base.update(diff);
+            base.Update(diff);
         }
 
-        public override void refreshWaypoints()
+        public override void RefreshWaypoints()
         {
 
         }
@@ -119,7 +119,7 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
 
         }
 
-        public override float getMoveSpeed()
+        public override float GetMoveSpeed()
         {
             return 0;
         }

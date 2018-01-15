@@ -5,7 +5,7 @@ namespace LeagueSandbox.GameServer.Logic.Packets.PacketDefinitions.S2C
 {
     public class FogUpdate2 : BasePacket
     {
-        public FogUpdate2(Unit unit, NetworkIdManager idManager) : base(PacketCmd.PKT_S2C_FogUpdate2, 0)
+        public FogUpdate2(AttackableUnit unit, NetworkIdManager idManager) : base(PacketCmd.PKT_S2C_FogUpdate2, 0)
         {
             buffer.Write((int)unit.Team);
             buffer.Write((byte)0xFE);

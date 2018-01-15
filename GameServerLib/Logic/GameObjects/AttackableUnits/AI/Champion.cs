@@ -236,20 +236,20 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
             return s;
         }
 
-        public override void update(float diff)
+        public override void Update(float diff)
         {
-            base.update(diff);
+            base.Update(diff);
 
             if (!IsDead && MoveOrder == MoveOrder.MOVE_ORDER_ATTACKMOVE && TargetUnit != null)
             {
                 var objects = _game.ObjectManager.GetObjects();
                 var distanceToTarget = 9000000.0f;
-                Unit nextTarget = null;
+                AttackableUnit nextTarget = null;
                 var range = Math.Max(Stats.Range.Total, DETECT_RANGE);
 
                 foreach (var it in objects)
                 {
-                    var u = it.Value as Unit;
+                    var u = it.Value as AttackableUnit;
 
                     if (u == null || u.IsDead || u.Team == Team || GetDistanceTo(u) > range)
                         continue;
@@ -351,7 +351,7 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
             return hash;
         }
 
-        public override bool isInDistress()
+        public override bool IsInDistress()
         {
             return DistressCause != null;
         }
@@ -384,7 +384,7 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
             return Inventory;
         }
 
-        public override void die(Unit killer)
+        public override void Die(AttackableUnit killer)
         {
             RespawnTimer = 5000 + GetStats().Level * 2500;
             _game.ObjectManager.StopTargeting(this);
@@ -456,9 +456,9 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
             _game.ObjectManager.StopTargeting(this);
         }
 
-        public override void onCollision(GameObject collider)
+        public override void OnCollision(GameObject collider)
         {
-            base.onCollision(collider);
+            base.OnCollision(collider);
             if (collider == null)
             {
                 //CORE_INFO("I bumped into a wall!");
@@ -469,7 +469,7 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
             }
         }
 
-        public override void DealDamageTo(Unit target, float damage, DamageType type, DamageSource source, bool isCrit)
+        public override void DealDamageTo(AttackableUnit target, float damage, DamageType type, DamageSource source, bool isCrit)
         {
             base.DealDamageTo(target, damage, type, source, isCrit);
 

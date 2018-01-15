@@ -50,7 +50,7 @@ namespace LeagueSandbox.GameServer.Logic.Scripting.CSharp
         {
             return _remove;
         }
-        public Unit GetUnit() { return _unit; }
+        public AttackableUnit GetUnit() { return _unit; }
         public Spell GetOwnerSpell() { return _ownerSpell; }
         public BuffGameScript GetBuffGameScript() { return _gameScript; }
         public String GetBuffNamespace() { return _buffNamespace; }

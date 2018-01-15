@@ -6,7 +6,7 @@ namespace LeagueSandbox.GameServer.Logic.Packets.PacketDefinitions.S2C
 {
     public class SpellAnimation : BasePacket
     {
-        public SpellAnimation(Unit u, string animationName)
+        public SpellAnimation(AttackableUnit u, string animationName)
             : base(PacketCmd.PKT_S2C_SpellAnimation, u.NetId)
         {
             buffer.Write((byte)0xC4); // unk  <--

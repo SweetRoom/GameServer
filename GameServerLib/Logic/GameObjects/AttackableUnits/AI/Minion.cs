@@ -94,9 +94,9 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
             base.OnAdded();
             _game.PacketNotifier.NotifyMinionSpawned(this, Team);
         }
-        public override void update(float diff)
+        public override void Update(float diff)
         {
-            base.update(diff);
+            base.Update(diff);
 
             if (!IsDead)
             {
@@ -116,17 +116,17 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
             }
         }
 
-        public override void onCollision(GameObject collider)
+        public override void OnCollision(GameObject collider)
         {
             if (collider == TargetUnit) // If we're colliding with the target, don't do anything.
             {
                 return;
             }
 
-            base.onCollision(collider);
+            base.OnCollision(collider);
         }
 
-        public override bool isInDistress()
+        public override bool IsInDistress()
         {
             return DistressCause != null;
         }
@@ -134,13 +134,13 @@ namespace LeagueSandbox.GameServer.Logic.GameObjects
         // AI tasks
         protected bool scanForTargets()
         {
-            Unit nextTarget = null;
+            AttackableUnit nextTarget = null;
             var nextTargetPriority = 14;
 
             var objects = _game.ObjectManager.GetObjects();
             foreach (var it in objects)
             {
-                var u = it.Value as Unit;
+                var u = it.Value as AttackableUnit;
 
                 // Targets have to be:
                 if (u == null ||                          // a unit

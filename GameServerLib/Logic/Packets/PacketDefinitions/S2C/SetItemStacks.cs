@@ -5,7 +5,7 @@ namespace LeagueSandbox.GameServer.Logic.Packets.PacketDefinitions.S2C
 {
     public class SetItemStacks : BasePacket
     {
-        public SetItemStacks(Unit unit, byte slot, byte stack1, byte stack2)
+        public SetItemStacks(AttackableUnit unit, byte slot, byte stack1, byte stack2)
             : base(PacketCmd.PKT_S2C_SetItemStacks, unit.NetId)
         {
             buffer.Write(slot);

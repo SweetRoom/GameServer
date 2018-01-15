@@ -117,7 +117,7 @@ namespace LeagueSandbox.GameServer.Logic.Packets.PacketHandlers
                 }
                 else if (kv.Value is Inhibitor || kv.Value is Nexus)
                 {
-                    var inhibtor = kv.Value as Unit;
+                    var inhibtor = kv.Value as AttackableUnit;
 
                     var minionSpawnPacket = new MinionSpawn2(inhibtor.NetId);
                     _game.PacketHandlerManager.sendPacket(peer, minionSpawnPacket, Channel.CHL_S2C);

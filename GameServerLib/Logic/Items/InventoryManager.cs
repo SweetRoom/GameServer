@@ -9,9 +9,9 @@ namespace LeagueSandbox.GameServer.Logic.Items
     public class InventoryManager
     {
         private Inventory _inventory;
-        private Unit _owner;
+        private AttackableUnit _owner;
 
-        private InventoryManager(Unit owner)
+        private InventoryManager(AttackableUnit owner)
         {
             _inventory = new Inventory(this);
         }
@@ -65,7 +65,7 @@ namespace LeagueSandbox.GameServer.Logic.Items
             return result;
         }
 
-        public static InventoryManager CreateInventory(Unit owner)
+        public static InventoryManager CreateInventory(AttackableUnit owner)
         {
             return new InventoryManager(owner);
         }

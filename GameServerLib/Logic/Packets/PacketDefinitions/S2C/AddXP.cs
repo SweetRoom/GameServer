@@ -5,7 +5,7 @@ namespace LeagueSandbox.GameServer.Logic.Packets.PacketDefinitions.S2C
 {
     public class AddXP : BasePacket
     {
-        public AddXP(Unit u, float xp)
+        public AddXP(AttackableUnit u, float xp)
             : base(PacketCmd.PKT_S2C_AddXP)
         {
             buffer.Write(u.NetId);
